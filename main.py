@@ -89,7 +89,8 @@ class VideoTracker(object):
         if self.args.save_path:
             os.makedirs(self.args.save_path, exist_ok=True)
             # path of saved video and results
-            self.save_video_path = os.path.join(self.args.save_path, "results.mp4")
+            video = self.args.input_path.split("/")[-1]
+            self.save_video_path = os.path.join(self.args.save_path, video)
 
             # create video writer
             fourcc = cv2.VideoWriter_fourcc(*self.args.fourcc)
@@ -138,9 +139,9 @@ class VideoTracker(object):
                 img0 = draw_boxes(img0, bbox_xyxy, identities)  # BGR
 
                 # add FPS information on output video
-                text_scale = max(1, img0.shape[1] // 1600)
+                text_scale = 4
                 cv2.putText(img0, 'frame: %d fps: %.2f ' % (idx_frame, len(avg_fps) / sum(avg_fps)),
-                        (20, 20 + text_scale), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255), thickness=2)
+                        (50, 58), cv2.FONT_HERSHEY_PLAIN, text_scale, (0, 0, 255), thickness=3)
 
             # display on window ******************************
             if self.args.display:
@@ -227,11 +228,11 @@ class VideoTracker(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # input and output
-    parser.add_argument('--input_path', type=str, default='input_480.mp4', help='source')  # file/folder, 0 for webcam
+    parser.add_argument('--input_path', type=str, default='WIN_20221029_16_49_19_Pro.mp4', help='source')  # file/folder, 0 for webcam
     parser.add_argument('--save_path', type=str, default='output/', help='output folder')  # output folder
     parser.add_argument("--frame_interval", type=int, default=2)
     parser.add_argument('--fourcc', type=str, default='mp4v', help='output video codec (verify ffmpeg support)')
-    parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    parser.add_argument('--device', default='0', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--save_txt', default='output/predict/', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
 
     # camera only
@@ -243,9 +244,9 @@ if __name__ == '__main__':
     # YOLO-V5 parameters
     parser.add_argument('--weights', type=str, default='yolov5/weights/yolov5s.pt', help='model.pt path')
     parser.add_argument('--img-size', type=int, default=640, help='inference size (pixels)')
-    parser.add_argument('--conf-thres', type=float, default=0.5, help='object confidence threshold')
-    parser.add_argument('--iou-thres', type=float, default=0.5, help='IOU threshold for NMS')
-    parser.add_argument('--classes', nargs='+', type=int, default=[0], help='filter by class')
+    parser.add_argument('--conf-thres', type=float, default=0.25, help='object confidence threshold')
+    parser.add_argument('--iou-thres', type=float, default=0.45, help='IOU threshold for NMS')
+    parser.add_argument('--classes', nargs='+', type=int, help='filter by class')
     parser.add_argument('--agnostic-nms', action='store_true', help='class-agnostic NMS')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
 
